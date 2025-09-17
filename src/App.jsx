@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+
+
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+// Auth Pages
+import Login from "./components/Auth/Login";
+// import ForgotPassword from "./components/Auth/ForgotPassword";
+import VerifyOtp from "./components/Auth/VerifyOtp";
+import ResetPassword from "./components/Auth/ResetPassword";
+import ForgotPassword from './components/Auth/ForgetPassword'
+// Protected Pages
+import Dashboard from "./Pages/Dashboard/Dashboard";
+import Users from "./Pages/Users/UserDetails";
+import Booking from "./Pages/Booking/Booking";
+import PaymentDetails from "./Pages/PaymentDetails/PaymentDetails";
+import Layout from "./components/Layout/Layout";
+import FreightRate from "./Pages/FreightRate/FreightRate";
+
+import "./index.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn"));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(localStorage.getItem("isLoggedIn"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Routes>
+        {/* Auth Routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Protected Routes */}
+        {isLoggedIn ? (
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/bookings" element={<Booking />} />
+            <Route path="/payments" element={<PaymentDetails />} />
+            <Route path="/freight-rate" element={<FreightRate />} />
+
+          </Route>
+        ) : (
+          <Route path="*" element={<Navigate to="/" />} />
+        )}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
