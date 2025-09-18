@@ -94,6 +94,29 @@ body {
   transition: background 0.3s ease;
 }
 
+
+/* Add these styles to your existing index.css */
+
+.sidebar {
+  background-color: #fff3e0; /* Light orange background */
+  color: #333; /* Dark text color */
+  position: fixed;
+  height: 100%;
+}
+
+.sidebar-icon {
+  color: #333; /* Dark color for icons */
+}
+
+.sidebar-menu li:hover {
+  background-color: #ffe0b2; /* Slightly darker orange on hover */
+  color: #000; /* Even darker text on hover */
+}
+
+.sidebar-title {
+  color: #333; /* Dark color for title */
+}
+
 .sidebar-menu li:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 6px;
@@ -249,6 +272,7 @@ body {
   border-bottom-left-radius: 20px;
   min-height: 100vh; /* Ensure it takes full height */
   width: 100%; /* Take full remaining width */
+  margin-left: 250px;
 }
 
 

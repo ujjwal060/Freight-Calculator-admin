@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { loginUser } from "../../api/auth"; // API service
+import { loginUser } from "../../api/auth";
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -16,25 +16,17 @@ const Login = () => {
     try {
       setError("");
 
-      // 1️⃣ Create login object
-      const loginUserData = {
-        email: data.email,
-        password: data.password
-      };
+      const res = await loginUser({ email: data.email, password: data.password });
+      console.log("Login Response:", res);
 
-      // 2️⃣ Call API with loginUserData
-      const res = await loginUser(loginUserData);
-
-      // 3️⃣ Check response & navigate
-      if (res?.admin?.token) {
+      if (res.admin?.token) {
         localStorage.setItem("token", res.admin.token);
+        localStorage.setItem("refreshToken", res.admin.refreshToken);
         localStorage.setItem("isLoggedIn", "true");
+        console.log(res.admin.refreshToken , res.admin.token)
 
-        // Show success popup
         alert(res.message || "Admin logged in successfully");
-
-        // Navigate to dashboard
-        navigate("/dashboard");
+        navigate("/dashboard"); // ✅ Works now because PrivateRoute allows access
       } else {
         setError("Invalid credentials!");
       }
@@ -51,7 +43,6 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           {error && <p style={{ color: "red" }}>{error}</p>}
 
-          {/* Email Field */}
           <div className="input-group">
             <input
               type="email"
@@ -61,7 +52,6 @@ const Login = () => {
           </div>
           {errors.email && <p style={{ color: "red" }}>{errors.email.message}</p>}
 
-          {/* Password Field */}
           <div className="input-group">
             <input
               type={showPassword ? "text" : "password"}
@@ -87,5 +77,4 @@ const Login = () => {
 };
 
 export default Login;
-
 

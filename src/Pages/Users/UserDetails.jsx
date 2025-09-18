@@ -43,8 +43,9 @@ const UserDetails = () => {
       };
 
       const res = await getUsers(payload);
-      setUsers(res.data || []);
-      setTotalCount(res.totalCount || 0);
+      console.log("res" , res)
+      setUsers(res?.data || []);
+      setTotalCount(res?.totalCount || 0);
       setLoading(false);
     } catch (err) {
       console.error("Error:", err);

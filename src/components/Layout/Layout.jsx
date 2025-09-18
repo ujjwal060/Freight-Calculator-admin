@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { FaHome, FaUser, FaBook, FaMoneyBill, FaBars,FaTruck  } from "react-icons/fa";
+import { FaHome, FaUser, FaBook, FaMoneyBill, FaBars, FaTruck } from "react-icons/fa";
 import "../../index.css";
 
 const Layout = () => {
@@ -39,15 +39,15 @@ const Layout = () => {
           </li>
 
           <li onClick={() => navigate("/freight-rate")}>
-  <FaTruck className="sidebar-icon" />
-  {!collapsed && <span>Freight Rate</span>}
-</li>
+            <FaTruck className="sidebar-icon" />
+            {!collapsed && <span>Freight Rate</span>}
+          </li>
 
         </ul>
       </div>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className="main-content " style={collapsed ? {marginLeft: "80px"} : {  }}>
         <div className="header">
           <button onClick={() => setCollapsed(!collapsed)} className="btn-icon">
             <FaBars />
