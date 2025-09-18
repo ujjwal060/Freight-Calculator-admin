@@ -19,6 +19,7 @@ import Layout from "./components/Layout/Layout";
 import FreightRate from "./Pages/FreightRate/FreightRate";
 
 import "./index.css";
+import AddFreightDialog from "./Pages/FreightRate/AddFreightDialog";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn"));
@@ -49,7 +50,7 @@ function App() {
             <Route path="/bookings" element={<Booking />} />
             <Route path="/payments" element={<PaymentDetails />} />
             <Route path="/freight-rate" element={<FreightRate />} />
-
+<Route path="/freight-rate" element={<AddFreightDialog />} />
           </Route>
         ) : (
           <Route path="*" element={<Navigate to="/" />} />

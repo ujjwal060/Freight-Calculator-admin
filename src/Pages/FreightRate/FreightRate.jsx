@@ -1,15 +1,14 @@
 
 
 
-
 import React, { useEffect, useState } from "react";
 import {
-  Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  TablePagination, CircularProgress, Select, MenuItem, FormControl, InputLabel, Typography
+  Box, Button, Typography, Paper, Table, TableBody, TableCell,
+  TableContainer, TableHead, TableRow, TablePagination, CircularProgress
 } from "@mui/material";
-
-import { getFreightRates , addFreightRate } from "../../api/freightrate";
+import { getFreightRates, addFreightRate } from "../../api/freightrate";
+// import AddFreightDialog from "../../components/AddFreightDialog";
+import AddFreightDialog from "./AddFreightDialog.jsx";
 const FreightRate = () => {
   const [freightRates, setFreightRates] = useState([]);
   const [open, setOpen] = useState(false);
@@ -27,11 +26,10 @@ const FreightRate = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch Freight Rates
   const fetchFreightRates = async () => {
     try {
       setLoading(true);
-      const payload = { limit: 10, offset: page * rowsPerPage };
+      const payload = { limit: rowsPerPage, offset: page * rowsPerPage };
       const res = await getFreightRates(payload);
       setFreightRates(res.data || []);
       setTotalCount(res.totalCount || 0);
@@ -42,7 +40,6 @@ const FreightRate = () => {
     }
   };
 
-  // ✅ Add Freight Rate
   const handleAddFreight = async () => {
     try {
       const payload = {
@@ -77,48 +74,24 @@ const FreightRate = () => {
     fetchFreightRates();
   }, [page, rowsPerPage]);
 
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" sx={{ mb: 2, color: "#ff6b35", fontWeight: "bold" }}>
         Freight Rate Management
       </Typography>
+
       <Button variant="contained" sx={{ background: "#ff6b35", mb: 2 }} onClick={() => setOpen(true)}>
         Add Freight Rate
       </Button>
 
-      {/* Add Freight Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Add Freight Rate</DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Container Size</InputLabel>
-            <Select name="containerSize" value={formData.containerSize} onChange={handleChange}>
-              <MenuItem value="20ft">20ft</MenuItem>
-              <MenuItem value="20ft HQ">20ft HQ</MenuItem>
-              <MenuItem value="40ft HQ">40ft HQ</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField name="departureCountry" label="Departure Country" fullWidth margin="dense" value={formData.departureCountry} onChange={handleChange} />
-          <TextField name="departurePort" label="Departure Port" fullWidth margin="dense" value={formData.departurePort} onChange={handleChange} />
-          <TextField name="arrivalCountry" label="Arrival Country" fullWidth margin="dense" value={formData.arrivalCountry} onChange={handleChange} />
-          <TextField name="arrivalPort" label="Arrival Port" fullWidth margin="dense" value={formData.arrivalPort} onChange={handleChange} />
-          <TextField name="basePriceDry" label="Base Price Dry" type="number" fullWidth margin="dense" value={formData.basePriceDry} onChange={handleChange} />
-          <TextField name="basePriceReefer" label="Base Price Reefer" type="number" fullWidth margin="dense" value={formData.basePriceReefer} onChange={handleChange} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color="secondary">Cancel</Button>
-          <Button onClick={handleAddFreight} sx={{ background: "#ff6b35", color: "#fff" }}>Add</Button>
-        </DialogActions>
-      </Dialog>
+      <AddFreightDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        handleAdd={handleAddFreight}
+        formData={formData}
+        handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
+      />
 
-      {/* Table */}
       <Paper>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
@@ -138,7 +111,7 @@ const FreightRate = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {freightRates.slice(0, rowsPerPage).map((rate) => (
+                  {freightRates.map((rate) => (
                     <TableRow key={rate._id}>
                       <TableCell>{rate.containerSize}</TableCell>
                       <TableCell>{rate.departureCountry} - {rate.departurePort}</TableCell>
@@ -154,9 +127,12 @@ const FreightRate = () => {
               component="div"
               count={totalCount}
               page={page}
-              onPageChange={handleChangePage}
+              onPageChange={(e, newPage) => setPage(newPage)}
               rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
             />
           </>
         )}
@@ -166,3 +142,4 @@ const FreightRate = () => {
 };
 
 export default FreightRate;
+
