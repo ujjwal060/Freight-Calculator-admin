@@ -1,7 +1,9 @@
 
 
 
-import React, { useState } from "react";
+
+
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -10,29 +12,67 @@ import {
   TableHead,
   TableRow,
   Paper,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Typography,
   Box,
+  Chip,
+  Stack,
+  Button,
+  CircularProgress
 } from "@mui/material";
+import axios from "axios";
 
 const Booking = () => {
-  const bookings = [
-    { id: 101, customer: "John Doe", date: "2025-09-15", status: "Confirmed" },
-    { id: 102, customer: "Jane Smith", date: "2025-09-16", status: "Pending" },
-    { id: 103, customer: "Michael Lee", date: "2025-09-17", status: "Cancelled" },
-    { id: 104, customer: "Alex Brown", date: "2025-09-18", status: "Deleted" },
-  ];
-
+  const [bookings, setBookings] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Filter bookings based on status
-  const filteredBookings =
-    filter === "All"
-      ? bookings
-      : bookings.filter((b) => b.status.toLowerCase() === filter.toLowerCase());
+  const statusOptions = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
+
+  // Fetch bookings from API
+  const fetchBookings = async (status) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        "http://15.134.44.62:8888/api/admin/booking/list",
+        {
+          limit: 10,
+          offset: 0,
+          status: status,
+          sortField: "",
+          sortBy: -1,
+          filters: {}
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data && response.data.data && response.data.data.bookings) {
+        setBookings(response.data.data.bookings);
+      } else {
+        setBookings([]);
+      }
+    } catch (err) {
+      console.error("API Error:", err);
+      setError("Failed to fetch bookings.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings(filter);
+  }, [filter]);
+
+  const handleDeleteChip = () => {
+    setFilter("All");
+  };
 
   return (
     <Box sx={{ padding: "20px" }}>
@@ -43,43 +83,88 @@ const Booking = () => {
         List of all customer bookings
       </Typography>
 
-      {/* Filter Section */}
-      <Box sx={{ marginBottom: "20px", width: "200px" }}>
-        <FormControl fullWidth>
-          <InputLabel>Status Filter</InputLabel>
-          <Select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            label="Status Filter"
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Confirmed">Confirmed</MenuItem>
-            <MenuItem value="Cancelled">Cancelled</MenuItem>
-            <MenuItem value="Deleted">Deleted</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      {/* Filter Chip */}
+      {filter !== "All" && (
+        <Stack direction="row" spacing={1} sx={{ marginBottom: 2 }}>
+          <Chip
+            label={`Status: ${filter}`}
+            onDelete={handleDeleteChip}
+            color="primary"
+            variant="outlined"
+          />
+        </Stack>
+      )}
 
-      {/* Table Section */}
+      {/* Status Filter Buttons */}
+      <Stack direction="row" spacing={1} sx={{ marginBottom: 2 }}>
+        {statusOptions.map((status) => (
+          <Button
+            key={status}
+            variant={filter === status ? "contained" : "outlined"}
+            color={
+              status === "Cancelled"
+                ? "error"
+                : status === "Pending"
+                ? "warning"
+                : status === "Confirmed"
+                ? "success"
+                : status === "Delivered"
+                ? "info"
+                : "primary"
+            }
+            onClick={() => setFilter(status)}
+            size="small"
+          >
+            {status}
+          </Button>
+        ))}
+      </Stack>
+
+      {/* Booking Table */}
       <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell>ID</TableCell>
-              <TableCell>Customer</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredBookings.map((b) => (
-              <TableRow key={b.id}>
-                <TableCell>{b.id}</TableCell>
-                <TableCell>{b.customer}</TableCell>
-                <TableCell>{b.date}</TableCell>
-                <TableCell>
-                  <span
+        {loading ? (
+          <Box sx={{ textAlign: "center", padding: 2 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error" align="center" sx={{ padding: 2 }}>
+            {error}
+          </Typography>
+        ) : bookings.length === 0 ? (
+          <Typography align="center" sx={{ padding: 2 }}>
+            No Data Available
+          </Typography>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                <TableCell>Booking ID</TableCell>
+                <TableCell>Customer Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Mobile</TableCell>
+                <TableCell>ETA</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Container Type</TableCell>
+                <TableCell>Total Containers</TableCell>
+                <TableCell>Departure → Arrival</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {bookings.map((b) => (
+                <TableRow key={b._id}>
+                  <TableCell>{b.bookingId}</TableCell>
+                  <TableCell>{b.user?.name || "N/A"}</TableCell>
+                  <TableCell>{b.user?.email || "N/A"}</TableCell>
+                  <TableCell>{b.user?.mobileNumber || "N/A"}</TableCell>
+                  <TableCell>{new Date(b.eta).toLocaleDateString()}</TableCell>
+                  <TableCell>{b.price}</TableCell>
+                  <TableCell>{b.containerType}</TableCell>
+                  <TableCell>{b.totalContainers}</TableCell>
+                  <TableCell>
+                    {b.freightRate?.departurePort} → {b.freightRate?.arrivalPort}
+                  </TableCell>
+                  <TableCell
                     style={{
                       color:
                         b.status === "Confirmed"
@@ -88,17 +173,19 @@ const Booking = () => {
                           ? "orange"
                           : b.status === "Cancelled"
                           ? "red"
+                          : b.status === "Delivered"
+                          ? "blue"
                           : "gray",
                       fontWeight: "bold",
                     }}
                   >
                     {b.status}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
     </Box>
   );
