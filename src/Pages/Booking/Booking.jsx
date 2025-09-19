@@ -1,8 +1,5 @@
 
 
-
-
-
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -53,7 +50,7 @@ const Booking = () => {
         }
       );
 
-      if (response.data && response.data.data && response.data.data.bookings) {
+      if (response.data?.data?.bookings) {
         setBookings(response.data.data.bookings);
       } else {
         setBookings([]);
@@ -121,7 +118,14 @@ const Booking = () => {
       </Stack>
 
       {/* Booking Table */}
-      <TableContainer component={Paper}>
+      <Paper
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          borderRadius: "12px",
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.1)"
+        }}
+      >
         {loading ? (
           <Box sx={{ textAlign: "center", padding: 2 }}>
             <CircularProgress />
@@ -135,58 +139,65 @@ const Booking = () => {
             No Data Available
           </Typography>
         ) : (
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell>Booking ID</TableCell>
-                <TableCell>Customer Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Mobile</TableCell>
-                <TableCell>ETA</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell>Container Type</TableCell>
-                <TableCell>Total Containers</TableCell>
-                <TableCell>Departure → Arrival</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {bookings.map((b) => (
-                <TableRow key={b._id}>
-                  <TableCell>{b.bookingId}</TableCell>
-                  <TableCell>{b.user?.name || "N/A"}</TableCell>
-                  <TableCell>{b.user?.email || "N/A"}</TableCell>
-                  <TableCell>{b.user?.mobileNumber || "N/A"}</TableCell>
-                  <TableCell>{new Date(b.eta).toLocaleDateString()}</TableCell>
-                  <TableCell>{b.price}</TableCell>
-                  <TableCell>{b.containerType}</TableCell>
-                  <TableCell>{b.totalContainers}</TableCell>
-                  <TableCell>
-                    {b.freightRate?.departurePort} → {b.freightRate?.arrivalPort}
-                  </TableCell>
-                  <TableCell
-                    style={{
-                      color:
-                        b.status === "Confirmed"
-                          ? "green"
-                          : b.status === "Pending"
-                          ? "orange"
-                          : b.status === "Cancelled"
-                          ? "red"
-                          : b.status === "Delivered"
-                          ? "blue"
-                          : "gray",
-                      fontWeight: "bold",
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow sx={{ background: "var(--primary-color)" }}>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Booking ID</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Customer Name</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Email</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Mobile</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ETA</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Price</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Container Type</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Total Containers</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Departure → Arrival</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {bookings.map((b) => (
+                  <TableRow
+                    key={b._id}
+                    sx={{
+                      "&:hover": { background: "rgba(255,107,53,0.05)" }
                     }}
                   >
-                    {b.status}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <TableCell>{b.bookingId}</TableCell>
+                    <TableCell>{b.user?.name || "N/A"}</TableCell>
+                    <TableCell>{b.user?.email || "N/A"}</TableCell>
+                    <TableCell>{b.user?.mobileNumber || "N/A"}</TableCell>
+                    <TableCell>{new Date(b.eta).toLocaleDateString()}</TableCell>
+                    <TableCell>{b.price}</TableCell>
+                    <TableCell>{b.containerType}</TableCell>
+                    <TableCell>{b.totalContainers}</TableCell>
+                    <TableCell>
+                      {b.freightRate?.departurePort} → {b.freightRate?.arrivalPort}
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        color:
+                          b.status === "Confirmed"
+                            ? "green"
+                            : b.status === "Pending"
+                            ? "orange"
+                            : b.status === "Cancelled"
+                            ? "red"
+                            : b.status === "Delivered"
+                            ? "blue"
+                            : "gray",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {b.status}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
-      </TableContainer>
+      </Paper>
     </Box>
   );
 };
