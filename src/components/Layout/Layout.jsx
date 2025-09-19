@@ -47,7 +47,7 @@ const Layout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="main-content " style={collapsed ? {marginLeft: "80px"} : {  }}>
+      <div className="main-content " style={collapsed ? { marginLeft: "80px" } : {}}>
         <div className="header">
           <button onClick={() => setCollapsed(!collapsed)} className="btn-icon">
             <FaBars />
@@ -56,7 +56,7 @@ const Layout = () => {
             Logout
           </button>
         </div>
-        <div className="content">
+        <div className="content" style={!collapsed ? { maxWidth: "calc(100vw - 270px)" } : { maxWidth: "calc(100vw - 90px)" }}>
           <Outlet />
         </div>
       </div>

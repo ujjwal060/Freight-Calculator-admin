@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -38,7 +40,7 @@ const Booking = () => {
         {
           limit: 10,
           offset: 0,
-          status: status,
+          status: status === "All" ? "" : status,
           sortField: "",
           sortBy: -1,
           filters: {}
@@ -62,6 +64,30 @@ const Booking = () => {
       setLoading(false);
     }
   };
+
+const handleStatusUpdate = async (bookingId, newStatus) => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.put(
+      `http://15.134.44.62:8888/api/admin/booking/status/${bookingId}`,
+      { status: newStatus },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    // Refresh booking list after update
+    fetchBookings(filter);
+  } catch (err) {
+    console.error("Status Update Error:", err.response?.data || err);
+    alert("Failed to update status");
+  }
+};
+
+
 
   useEffect(() => {
     fetchBookings(filter);
@@ -153,6 +179,7 @@ const Booking = () => {
                   <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Total Containers</TableCell>
                   <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Departure → Arrival</TableCell>
                   <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Status</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -190,6 +217,34 @@ const Booking = () => {
                       }}
                     >
                       {b.status}
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="success"
+                          onClick={() => handleStatusUpdate(b._id, "Confirmed")}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="info"
+                          onClick={() => handleStatusUpdate(b._id, "Delivered")}
+                        >
+                          Deliver
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleStatusUpdate(b._id, "Cancelled")}
+                        >
+                          Cancel
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
