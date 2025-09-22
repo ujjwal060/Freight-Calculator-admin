@@ -60,30 +60,31 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="main-content" style={collapsed ? { marginLeft: "80px" } : {}}>
-        <div className="header">
-          <button onClick={() => setCollapsed(!collapsed)} className="btn-icon">
-            <FaBars />
-          </button>
+  <div className="header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <button onClick={() => setCollapsed(!collapsed)} className="btn-icon">
+      <FaBars />
+    </button>
 
-          {/* Header Title with Custom Color */}
-          <h2
-            className="header-title"
-            style={{
-              color: "#ff6b35",
-              margin: "0",
-              fontSize: "24px",
-              fontWeight: "bold",
-              flexGrow: 1,
-              textAlign: "center"
-            }}
-          >
-            {currentTitle}
-          </h2>
+    {/* Title next to FaBars */}
+    <h2
+      className="header-title"
+      style={{
+        color: "#ff6b35",
+        margin: "0",
+        fontSize: "24px",
+        fontWeight: "bold",
+      }}
+    >
+      {currentTitle}
+    </h2>
+  </div>
 
-          <button onClick={() => setShowLogoutPopup(true)} className="btn-small">
-            Logout
-          </button>
-        </div>
+  {/* Logout Button stays right */}
+  <button onClick={() => setShowLogoutPopup(true)} className="btn-small">
+    Logout
+  </button>
+</div>
 
         <div className="content" style={!collapsed ? { maxWidth: "calc(100vw - 270px)" } : { maxWidth: "calc(100vw - 90px)" }}>
           <Outlet />
