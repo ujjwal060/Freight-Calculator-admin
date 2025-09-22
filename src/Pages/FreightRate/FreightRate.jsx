@@ -135,16 +135,9 @@ const FreightRate = () => {
       {/* Heading & Add Button */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h5" sx={{ color: "#ff6b35", fontWeight: "bold" }}>
-          Freight Rate Management
+          {/* Freight Rate Management */}
         </Typography>
-        {/* <Button
-          variant="contained"
-          sx={{ background: "#ff6b35", textTransform: "none" }}
-          startIcon={<AddIcon />}
-          onClick={() => { setOpen(true); setEditMode(false); }}
-        >
-          Add
-        </Button> */}
+      
 
 
         <Button

@@ -1,7 +1,8 @@
 
 
+
 import React, { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { FaHome, FaUser, FaBook, FaMoneyBill, FaBars, FaTruck } from "react-icons/fa";
 import "../../index.css";
 
@@ -9,6 +10,19 @@ const Layout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Map routes to page titles
+  const pageTitles = {
+    "/dashboard": "Dashboard",
+    "/users": "User Details",
+    "/bookings": "Booking Details",
+    "/payments": "Payment Details",
+    "/freight-rate": "Freight Rate Details",
+  };
+
+  // Get the current page title based on the path
+  const currentTitle = pageTitles[location.pathname] || "Admin Panel";
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
@@ -37,25 +51,40 @@ const Layout = () => {
             <FaMoneyBill className="sidebar-icon" />
             {!collapsed && <span>Payments</span>}
           </li> */}
-
           <li onClick={() => navigate("/freight-rate")}>
             <FaTruck className="sidebar-icon" />
             {!collapsed && <span>Freight Rate</span>}
           </li>
-
         </ul>
       </div>
 
       {/* Main Content */}
-      <div className="main-content " style={collapsed ? { marginLeft: "80px" } : {}}>
+      <div className="main-content" style={collapsed ? { marginLeft: "80px" } : {}}>
         <div className="header">
           <button onClick={() => setCollapsed(!collapsed)} className="btn-icon">
             <FaBars />
           </button>
+
+          {/* Header Title with Custom Color */}
+          <h2
+            className="header-title"
+            style={{
+              color: "#ff6b35",
+              margin: "0",
+              fontSize: "24px",
+              fontWeight: "bold",
+              flexGrow: 1,
+              textAlign: "center"
+            }}
+          >
+            {currentTitle}
+          </h2>
+
           <button onClick={() => setShowLogoutPopup(true)} className="btn-small">
             Logout
           </button>
         </div>
+
         <div className="content" style={!collapsed ? { maxWidth: "calc(100vw - 270px)" } : { maxWidth: "calc(100vw - 90px)" }}>
           <Outlet />
         </div>
@@ -79,4 +108,3 @@ const Layout = () => {
 };
 
 export default Layout;
-

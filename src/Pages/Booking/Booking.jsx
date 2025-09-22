@@ -174,7 +174,7 @@ const fetchCounts = async () => {
 
   return (
     <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>Booking Details</Typography>
+      {/* <Typography variant="h4" gutterBottom>Booking Details</Typography> */}
       <Typography variant="subtitle1" gutterBottom>List of all customer bookings</Typography>
 
    

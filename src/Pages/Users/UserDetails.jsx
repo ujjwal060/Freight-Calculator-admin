@@ -64,9 +64,9 @@ const UserDetails = () => {
 
   return (
     <Box sx={{ padding: "20px", minHeight: "100vh" }}>
-      <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold", color: "var(--primary-color)" }}>
+      {/* <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold", color: "var(--primary-color)" }}>
         User Details
-      </Typography>
+      </Typography> */}
 
       <Paper sx={{ width: "100%", overflow: "hidden", borderRadius: "12px" }}>
         {loading ? (

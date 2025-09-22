@@ -6,8 +6,8 @@ import { FaUser, FaBook, FaMoneyBill, FaCalculator } from "react-icons/fa";
 const Dashboard = () => {
   return (
     <div className="dashboard-page">
-      <h1 className="dashboard-title">Admin Dashboard</h1>
-      <p className="dashboard-subtitle">Welcome to your Calculator Admin Panel!</p>
+      {/* <h1 className="dashboard-title">Admin Dashboard</h1> */}
+      {/* <p className="dashboard-subtitle">Welcome to your Calculator Admin Panel!</p> */}
 
       {/* Stat Cards */}
       <div className="stats-container">
