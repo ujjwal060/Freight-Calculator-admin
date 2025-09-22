@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    try {
+    try { 
       setError("");
 
       const res = await loginUser({ email: data.email, password: data.password });
