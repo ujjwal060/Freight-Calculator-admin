@@ -25,6 +25,7 @@ const AddFreightDialog = ({ open, handleClose, handleAdd, formData, handleChange
         <InputLabel>Container Size</InputLabel>
         <Select name="containerSize" value={formData.containerSize} onChange={handleChange}>
           <MenuItem value="20ft">20ft</MenuItem>
+          <MenuItem value="20ft">40ft</MenuItem>
           <MenuItem value="20ft HQ">20ft HQ</MenuItem>
           <MenuItem value="40ft HQ">40ft HQ</MenuItem>
         </Select>
