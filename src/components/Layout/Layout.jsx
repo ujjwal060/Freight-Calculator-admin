@@ -47,10 +47,7 @@ const Layout = () => {
             <FaBook className="sidebar-icon" />
             {!collapsed && <span>Bookings</span>}
           </li>
-          {/* <li onClick={() => navigate("/payments")}>
-            <FaMoneyBill className="sidebar-icon" />
-            {!collapsed && <span>Payments</span>}
-          </li> */}
+       
           <li onClick={() => navigate("/freight-rate")}>
             <FaTruck className="sidebar-icon" />
             {!collapsed && <span>Freight Rate</span>}

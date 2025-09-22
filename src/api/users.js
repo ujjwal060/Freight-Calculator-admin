@@ -1,6 +1,5 @@
 import axios from "./axios";
 
-// const API_URL = "http://15.134.44.62:8888/api"; // Base URL
 
 export const getUsers = async (payload) => {
   try {
