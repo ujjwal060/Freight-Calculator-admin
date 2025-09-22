@@ -25,7 +25,7 @@ const Login = () => {
         localStorage.setItem("isLoggedIn", "true");
         console.log(res.admin.refreshToken , res.admin.token)
 
-        alert(res.message || "Admin logged in successfully");
+        // alert(res.message || "Admin logged in successfully");
         navigate("/dashboard"); // ✅ Works now because PrivateRoute allows access
       } else {
         setError("Invalid credentials!");
