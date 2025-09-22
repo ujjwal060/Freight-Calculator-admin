@@ -16,8 +16,15 @@ import {
   Chip,
   Stack,
   Button,
-  CircularProgress
+  CircularProgress,
+  Tooltip,
+  IconButton
 } from "@mui/material";
+// import { CheckCircle, LocalShipping, Cancel } from "@mui/icons-material";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import LocalShipping from "@mui/icons-material/LocalShipping";
+import Cancel from "@mui/icons-material/Cancel";
+
 import axios from "axios";
 
 const Booking = () => {
@@ -25,10 +32,27 @@ const Booking = () => {
   const [filter, setFilter] = useState("All");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [counts, setCounts] = useState({ pending: 0, confirmed: 0, delivered: 0 });
 
   const statusOptions = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
 
-  // Fetch bookings from API
+ 
+const fetchCounts = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(
+      "http://15.134.44.62:8888/api/admin/booking/counts",
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (response.data?.data) {
+      setCounts(response.data.data); // Keep API keys as is
+    }
+  } catch (err) {
+    console.error("Counts API Error:", err);
+  }
+};
+
+  // Fetch bookings
   const fetchBookings = async (status) => {
     setLoading(true);
     setError("");
@@ -45,18 +69,10 @@ const Booking = () => {
           sortBy: -1,
           filters: {}
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data?.data?.bookings) {
-        setBookings(response.data.data.bookings);
-      } else {
-        setBookings([]);
-      }
+      setBookings(response.data?.data?.bookings || []);
     } catch (err) {
       console.error("API Error:", err);
       setError("Failed to fetch bookings.");
@@ -65,105 +81,140 @@ const Booking = () => {
     }
   };
 
-const handleStatusUpdate = async (bookingId, newStatus) => {
-  try {
-    const token = localStorage.getItem("token");
-    await axios.put(
-      `http://15.134.44.62:8888/api/admin/booking/status/${bookingId}`,
-      { status: newStatus },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
+  // Handle status update
+  const handleStatusUpdate = async (bookingId, newStatus) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://15.134.44.62:8888/api/admin/booking/status/${bookingId}`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
 
-    // Refresh booking list after update
-    fetchBookings(filter);
-  } catch (err) {
-    console.error("Status Update Error:", err.response?.data || err);
-    alert("Failed to update status");
-  }
-};
-
-
+      fetchBookings(filter);
+      fetchCounts(); // Refresh counts also
+    } catch (err) {
+      console.error("Status Update Error:", err.response?.data || err);
+      alert("Failed to update status");
+    }
+  };
 
   useEffect(() => {
     fetchBookings(filter);
+    fetchCounts();
   }, [filter]);
 
   const handleDeleteChip = () => {
     setFilter("All");
   };
 
+  // Icon rendering logic based on filter
+  const getActionIcons = (b) => {
+    const actions = [];
+
+    if (filter === "All") {
+      actions.push(
+        <Tooltip title="Confirm" key="confirm">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Confirmed")} color="success">
+            <CheckCircle />
+          </IconButton>
+        </Tooltip>,
+        <Tooltip title="Deliver" key="deliver">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Delivered")} color="info">
+            <LocalShipping />
+          </IconButton>
+        </Tooltip>,
+        <Tooltip title="Cancel" key="cancel">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Cancelled")} color="error">
+            <Cancel />
+          </IconButton>
+        </Tooltip>
+      );
+    } else if (filter === "Pending") {
+      actions.push(
+        <Tooltip title="Confirm" key="confirm">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Confirmed")} color="success">
+            <CheckCircle />
+          </IconButton>
+        </Tooltip>,
+        <Tooltip title="Cancel" key="cancel">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Cancelled")} color="error">
+            <Cancel />
+          </IconButton>
+        </Tooltip>
+      );
+    } else if (filter === "Confirmed") {
+      actions.push(
+        <Tooltip title="Deliver" key="deliver">
+          <IconButton onClick={() => handleStatusUpdate(b._id, "Delivered")} color="info">
+            <LocalShipping />
+          </IconButton>
+        </Tooltip>
+      );
+    } else if (filter === "Delivered") {
+      actions.push(
+        <Tooltip title="Delivered" key="delivered">
+          <IconButton disabled color="info">
+            <LocalShipping />
+          </IconButton>
+        </Tooltip>
+      );
+    } else if (filter === "Cancelled") {
+      actions.push(
+        <Tooltip title="Cancelled" key="cancelled">
+          <IconButton disabled color="error">
+            <Cancel />
+          </IconButton>
+        </Tooltip>
+      );
+    }
+
+    return actions;
+  };
+
   return (
     <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" gutterBottom>
-        Booking Details
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        List of all customer bookings
-      </Typography>
+      <Typography variant="h4" gutterBottom>Booking Details</Typography>
+      <Typography variant="subtitle1" gutterBottom>List of all customer bookings</Typography>
+
+   
 
       {/* Filter Chip */}
       {filter !== "All" && (
-        <Stack direction="row" spacing={1} sx={{ marginBottom: 2 }}>
-          <Chip
-            label={`Status: ${filter}`}
-            onDelete={handleDeleteChip}
-            color="primary"
-            variant="outlined"
-          />
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+          <Chip label={`Status: ${filter}`} onDelete={handleDeleteChip} color="primary" variant="outlined" />
         </Stack>
       )}
 
-      {/* Status Filter Buttons */}
-      <Stack direction="row" spacing={1} sx={{ marginBottom: 2 }}>
-        {statusOptions.map((status) => (
-          <Button
-            key={status}
-            variant={filter === status ? "contained" : "outlined"}
-            color={
-              status === "Cancelled"
-                ? "error"
-                : status === "Pending"
-                ? "warning"
-                : status === "Confirmed"
-                ? "success"
-                : status === "Delivered"
-                ? "info"
-                : "primary"
-            }
-            onClick={() => setFilter(status)}
-            size="small"
-          >
-            {status}
-          </Button>
-        ))}
-      </Stack>
+{/* Status Filter Buttons with Counts */}
+<Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+  {statusOptions.map((status) => {
+    const count = counts?.[status] ?? 0; // Fix: get count from API keys directly
+    return (
+      <Button
+        key={status}
+        variant={filter === status ? "contained" : "outlined"}
+        color={
+          status === "Cancelled" ? "error" :
+          status === "Pending" ? "warning" :
+          status === "Confirmed" ? "success" :
+          status === "Delivered" ? "info" : "primary"
+        }
+        onClick={() => setFilter(status)}
+        size="small"
+      >
+        {`${status} (${count})`}
+      </Button>
+    );
+  })}
+</Stack>
 
       {/* Booking Table */}
-      <Paper
-        sx={{
-          width: "100%",
-          overflow: "hidden",
-          borderRadius: "12px",
-          boxShadow: "0px 2px 8px rgba(0,0,0,0.1)"
-        }}
-      >
+      <Paper sx={{ width: "100%", overflow: "hidden", borderRadius: "12px", boxShadow: "0px 2px 8px rgba(0,0,0,0.1)" }}>
         {loading ? (
-          <Box sx={{ textAlign: "center", padding: 2 }}>
+          <Box sx={{ textAlign: "center", p: 2 }}>
             <CircularProgress />
           </Box>
-        ) : error ? (
-          <Typography color="error" align="center" sx={{ padding: 2 }}>
-            {error}
-          </Typography>
-        ) : bookings.length === 0 ? (
-          <Typography align="center" sx={{ padding: 2 }}>
-            No Data Available
-          </Typography>
         ) : (
           <TableContainer>
             <Table>
@@ -183,71 +234,40 @@ const handleStatusUpdate = async (bookingId, newStatus) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bookings.map((b) => (
-                  <TableRow
-                    key={b._id}
-                    sx={{
-                      "&:hover": { background: "rgba(255,107,53,0.05)" }
-                    }}
-                  >
-                    <TableCell>{b.bookingId}</TableCell>
-                    <TableCell>{b.user?.name || "N/A"}</TableCell>
-                    <TableCell>{b.user?.email || "N/A"}</TableCell>
-                    <TableCell>{b.user?.mobileNumber || "N/A"}</TableCell>
-                    <TableCell>{new Date(b.eta).toLocaleDateString()}</TableCell>
-                    <TableCell>{b.price}</TableCell>
-                    <TableCell>{b.containerType}</TableCell>
-                    <TableCell>{b.totalContainers}</TableCell>
-                    <TableCell>
-                      {b.freightRate?.departurePort} → {b.freightRate?.arrivalPort}
-                    </TableCell>
-                    <TableCell
-                      style={{
-                        color:
-                          b.status === "Confirmed"
-                            ? "green"
-                            : b.status === "Pending"
-                            ? "orange"
-                            : b.status === "Cancelled"
-                            ? "red"
-                            : b.status === "Delivered"
-                            ? "blue"
-                            : "gray",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {b.status}
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color="success"
-                          onClick={() => handleStatusUpdate(b._id, "Confirmed")}
-                        >
-                          Confirm
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color="info"
-                          onClick={() => handleStatusUpdate(b._id, "Delivered")}
-                        >
-                          Deliver
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          color="error"
-                          onClick={() => handleStatusUpdate(b._id, "Cancelled")}
-                        >
-                          Cancel
-                        </Button>
-                      </Stack>
-                    </TableCell>
+                {bookings.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={11} align="center">No Data Available</TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  bookings.map((b) => (
+                    <TableRow key={b._id} sx={{ "&:hover": { background: "rgba(255,107,53,0.05)" } }}>
+                      <TableCell>{b.bookingId}</TableCell>
+                      <TableCell>{b.user?.name || "N/A"}</TableCell>
+                      <TableCell>{b.user?.email || "N/A"}</TableCell>
+                      <TableCell>{b.user?.mobileNumber || "N/A"}</TableCell>
+                      <TableCell>{new Date(b.eta).toLocaleDateString()}</TableCell>
+                      <TableCell>{b.price}</TableCell>
+                      <TableCell>{b.containerType}</TableCell>
+                      <TableCell>{b.totalContainers}</TableCell>
+                      <TableCell>{b.freightRate?.departurePort} → {b.freightRate?.arrivalPort}</TableCell>
+                      <TableCell
+                        style={{
+                          color:
+                            b.status === "Confirmed" ? "green" :
+                            b.status === "Pending" ? "orange" :
+                            b.status === "Cancelled" ? "red" :
+                            b.status === "Delivered" ? "blue" : "gray",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {b.status}
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>{getActionIcons(b)}</Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -258,3 +278,4 @@ const handleStatusUpdate = async (bookingId, newStatus) => {
 };
 
 export default Booking;
+
