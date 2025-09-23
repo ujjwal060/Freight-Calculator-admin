@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  Box, Button, Typography, Paper, Table, TableBody, TableCell,
+  Box, Button, Typography, Paper, Table, TableBody, TableCell ,
   TableContainer, TableHead, TableRow, TablePagination, CircularProgress, IconButton
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -26,7 +26,7 @@ const FreightRate = () => {
     basePriceReefer: ""
   });
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -102,18 +102,18 @@ const FreightRate = () => {
 
 
   const handleClose = () => {
-  setOpen(false);
-  setEditMode(false);
-  setFormData({
-    containerSize: "",
-    departureCountry: "",
-    departurePort: "",
-    arrivalCountry: "",
-    arrivalPort: "",
-    basePriceDry: "",
-    basePriceReefer: ""
-  });
-};
+    setOpen(false);
+    setEditMode(false);
+    setFormData({
+      containerSize: "",
+      departureCountry: "",
+      departurePort: "",
+      arrivalCountry: "",
+      arrivalPort: "",
+      basePriceDry: "",
+      basePriceReefer: ""
+    });
+  };
 
   // Delete freight rate
   const handleDelete = async (id) => {
@@ -137,29 +137,29 @@ const FreightRate = () => {
         <Typography variant="h5" sx={{ color: "#ff6b35", fontWeight: "bold" }}>
           {/* Freight Rate Management */}
         </Typography>
-      
+
 
 
         <Button
-  variant="contained"
-  sx={{ background: "#ff6b35", textTransform: "none" }}
-  startIcon={<AddIcon />}
-  onClick={() => { 
-    setFormData({
-      containerSize: "",
-      departureCountry: "",
-      departurePort: "",
-      arrivalCountry: "",
-      arrivalPort: "",
-      basePriceDry: "",
-      basePriceReefer: ""
-    }); // ✅ Reset form data
-    setEditMode(false);  // ✅ Edit mode off
-    setOpen(true);       // ✅ Open dialog
-  }}
->
-  Add
-</Button>
+          variant="contained"
+          sx={{ background: "#ff6b35", textTransform: "none" }}
+          startIcon={<AddIcon />}
+          onClick={() => {
+            setFormData({
+              containerSize: "",
+              departureCountry: "",
+              departurePort: "",
+              arrivalCountry: "",
+              arrivalPort: "",
+              basePriceDry: "",
+              basePriceReefer: ""
+            }); // ✅ Reset form data
+            setEditMode(false);  // ✅ Edit mode off
+            setOpen(true);       // ✅ Open dialog
+          }}
+        >
+          Add
+        </Button>
 
       </Box>
 
@@ -173,17 +173,17 @@ const FreightRate = () => {
         editMode={editMode}
       />
 
-      <Paper>
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
             <CircularProgress sx={{ color: "#ff6b35" }} />
           </Box>
         ) : (
           <>
-            <TableContainer>
-              <Table>
+            <TableContainer sx={{ maxHeight: "60vh", minHeight: "60vh", overflow: "auto", width: "100%" }}>
+              <Table stickyHeader aria-label="sticky table">
                 <TableHead>
-                  <TableRow sx={{ background: "#ff6b35" }}>
+                  <TableRow className="table-custom" sx={{ background: "#ff6b35" }}>
                     <TableCell sx={{ color: "#fff" }}>Container Size</TableCell>
                     <TableCell sx={{ color: "#fff" }}>Departure</TableCell>
                     <TableCell sx={{ color: "#fff" }}>Arrival</TableCell>
@@ -192,7 +192,7 @@ const FreightRate = () => {
                     <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
-                <TableBody>
+                <TableBody sx={{ maxHeight: "inherit", overflow: "scroll", overflowX: "hidden" }}>
                   {freightRates.map((rate) => (
                     <TableRow key={rate._id}>
                       <TableCell>{rate.containerSize}</TableCell>
@@ -201,12 +201,17 @@ const FreightRate = () => {
                       <TableCell>{rate.basePrice?.Dry}</TableCell>
                       <TableCell>{rate.basePrice?.Reefer}</TableCell>
                       <TableCell>
-                        <IconButton color="primary" onClick={() => handleEdit(rate)}>
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleDelete(rate._id)}>
+                        <TableCell sx={{padding:"4px"}}>
+                          <IconButton color="primary" onClick={() => handleEdit(rate)}>
+                            <EditIcon />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell  sx={{padding:"4px"}}> 
+                          <IconButton color="error" onClick={() => handleDelete(rate._id)}>
                           <DeleteIcon />
                         </IconButton>
+                        </TableCell>
+
                       </TableCell>
                     </TableRow>
                   ))}

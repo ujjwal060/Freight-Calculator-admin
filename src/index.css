@@ -239,6 +239,9 @@ body {
   flex-direction: column;
 }
 
+.table-custom th{
+  background-color: inherit !important;
+}
 .sidebar-title {
   font-size: 1.5rem;
   margin-bottom: 2rem;
