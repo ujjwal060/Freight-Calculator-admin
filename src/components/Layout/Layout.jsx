@@ -66,12 +66,12 @@ const Layout = () => {
     {/* Title next to FaBars */}
     <h2
       className="header-title"
-      style={{
-        color: "#ff6b35",
-        margin: "0",
-        fontSize: "24px",
-        fontWeight: "bold",
-      }}
+      // style={{
+      //   color: "#ff6b35",
+      //   margin: "0",
+      //   fontSize: "24px",
+      //   fontWeight: "bold",
+      // }}
     >
       {currentTitle}
     </h2>
