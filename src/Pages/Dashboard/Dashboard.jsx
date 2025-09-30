@@ -21,11 +21,17 @@ const Dashboard = () => {
           <h3>85</h3>
           <p>Total Bookings</p>
         </div>
-        <div className="stat-card">
+        {/* <div className="stat-card">
           <FaMoneyBill className="stat-icon" />
           <h3>₹50,000</h3>
           <p>Total Payments</p>
-        </div>
+        </div> */}
+        <div className="stat-card">
+  <FaMoneyBill className="stat-icon" />
+  <h3>₹50,000</h3>
+  <p>Complete Bookings</p>
+</div>
+
         <div className="stat-card">
           <FaCalculator className="stat-icon" />
           <h3>35</h3>
