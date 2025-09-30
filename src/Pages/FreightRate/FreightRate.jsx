@@ -560,7 +560,7 @@ const FreightRate = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination
+            {/* <TablePagination
               component="div"
               count={totalCount}
               page={page}
@@ -570,7 +570,20 @@ const FreightRate = () => {
                 setRowsPerPage(parseInt(e.target.value, 10));
                 setPage(0);
               }}
-            />
+            /> */}
+
+            <TablePagination
+  component="div"
+  count={totalCount}
+  page={page}
+  onPageChange={(e, newPage) => setPage(newPage)}
+  rowsPerPage={rowsPerPage}
+  onRowsPerPageChange={(e) => {
+    setRowsPerPage(parseInt(e.target.value, 10));
+    setPage(0);
+  }}
+  rowsPerPageOptions={[10, 20, 50]} // ✅ sirf ye 3 options dikhenge
+/>
           </>
         )}
       </Paper>
