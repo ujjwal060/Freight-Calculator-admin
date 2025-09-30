@@ -135,7 +135,8 @@ const UserDetails = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 20]}
+          // rowsPerPageOptions={[5, 10, 20]}
+            rowsPerPageOptions={[10, 20]}
           sx={{
             ".MuiTablePagination-toolbar": {
               backgroundColor: "var(--primary-bg)",
