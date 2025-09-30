@@ -35,20 +35,20 @@ const Layout = () => {
       <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="sidebar-title">{collapsed ? "AP" : "Admin Panel"}</div>
         <ul className="sidebar-menu">
-          <li onClick={() => navigate("/dashboard")}>
+          <li onClick={() => navigate("/dashboard")} className={location.pathname === "/dashboard" ? "active" : ""}>
             <FaHome className="sidebar-icon" />
             {!collapsed && <span>Dashboard</span>}
           </li>
-          <li onClick={() => navigate("/users")}>
+          <li onClick={() => navigate("/users")} className={location.pathname === "/users" ? "active" : ""}>
             <FaUser className="sidebar-icon" />
             {!collapsed && <span>Users</span>}
           </li>
-          <li onClick={() => navigate("/bookings")}>
+          <li onClick={() => navigate("/bookings")}  className={location.pathname === "/bookings" ? "active" : ""}>
             <FaBook className="sidebar-icon" />
             {!collapsed && <span>Bookings</span>}
           </li>
        
-          <li onClick={() => navigate("/freight-rate")}>
+          <li onClick={() => navigate("/freight-rate")}  className={location.pathname === "/freight-rate" ? "active" : ""}>
             <FaTruck className="sidebar-icon" />
             {!collapsed && <span>Freight Rate</span>}
           </li>

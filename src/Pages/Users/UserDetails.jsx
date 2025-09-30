@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useEffect, useState } from "react";
 
 import { getUsers } from "../../api/users";
@@ -43,7 +39,7 @@ const UserDetails = () => {
       };
 
       const res = await getUsers(payload);
-      console.log("res" , res)
+      console.log("res", res);
       setUsers(res?.data || []);
       setTotalCount(res?.totalCount || 0);
       setLoading(false);
@@ -63,7 +59,7 @@ const UserDetails = () => {
   };
 
   return (
-    <Box sx={{ padding: "20px", minHeight: "100vh" }}>
+    <Box sx={{ padding: "20px" , height:"100%"}}>
       {/* <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold", color: "var(--primary-color)" }}>
         User Details
       </Typography> */}
@@ -74,17 +70,38 @@ const UserDetails = () => {
             <CircularProgress sx={{ color: "var(--primary-color)" }} />
           </Box>
         ) : (
-          <TableContainer>
-            <Table>
+          <TableContainer
+            sx={{
+              maxHeight: "65vh",
+              minHeight: "65vh",
+              overflow: "auto",
+              width: "100%",
+            }}
+          >
+            <Table stickyHeader aria-label="sticky table">
               <TableHead>
-                <TableRow sx={{ background: "var(--primary-color)" }}>
-                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Sr.</TableCell>
-                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Name</TableCell>
-                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Email</TableCell>
-                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Mobile</TableCell>
+                <TableRow  className="table-custom" sx={{ background: "#ff6b35" }}>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Sr.
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Name
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Email
+                  </TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
+                    Mobile
+                  </TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
+              <TableBody
+                sx={{
+                  maxHeight: "inherit",
+                  overflow: "scroll",
+                  overflowX: "hidden",
+                }}
+              >
                 {users.map((user, index) => (
                   <TableRow
                     key={user._id}
@@ -137,4 +154,3 @@ const UserDetails = () => {
 };
 
 export default UserDetails;
-

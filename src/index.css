@@ -9,8 +9,8 @@
   --input-placeholder: #bfbfbf;
   --btn-text: #ffffff;
   --link-color: #ff6b35;
-  
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 400;
   line-height: 1.5;
   font-synthesis: none;
@@ -40,7 +40,7 @@ body {
   min-height: 100vh;
   background: var(--secondary-color);
   color: var(--text-primary);
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-weight: 400;
   line-height: 1.5;
   font-synthesis: none;
@@ -59,6 +59,11 @@ body {
   border-radius: 20px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+.sidebar .active {
+  background-color: #e45c08c4; /* Slightly darker orange for active item */
+  color: #fff; /* Darker text for active item */
+  border-radius: 0;
 }
 
 /* Headings */
@@ -94,18 +99,17 @@ body {
   transition: background 0.3s ease;
 }
 
-
 /* Add these styles to your existing index.css */
 
 .sidebar {
-  background-color: #fff3e0; /* Light orange background */
+  background-color: #fff3e0;
   color: #333; /* Dark text color */
   position: fixed;
   height: 100%;
 }
 
 .sidebar-icon {
-  color: #333; /* Dark color for icons */
+  color: #fff; /* Dark color for icons */
 }
 
 .sidebar-menu li:hover {
@@ -113,8 +117,16 @@ body {
   color: #000; /* Even darker text on hover */
 }
 
+.table-custom th {
+  white-space: nowrap;
+}
+
+.rmdp-container  input{
+  width:100% !important;
+  height:28px !important;
+}
 .sidebar-title {
-  color: #333; /* Dark color for title */
+  color: #fff; /* Dark color for title */
 }
 
 .sidebar-menu li:hover {
@@ -215,9 +227,6 @@ body {
   }
 }
 
-
-
-
 /* Dashboard Layout */
 .dashboard-container {
   display: flex;
@@ -227,7 +236,6 @@ body {
   margin: 0;
   padding: 0;
 }
-
 
 /* Sidebar */
 .sidebar {
@@ -239,7 +247,7 @@ body {
   flex-direction: column;
 }
 
-.table-custom th{
+.table-custom th {
   background-color: inherit !important;
 }
 .sidebar-title {
@@ -277,7 +285,6 @@ body {
   width: 100%; /* Take full remaining width */
   margin-left: 250px;
 }
-
 
 /* Header */
 .header {
@@ -341,9 +348,6 @@ body {
   }
 }
 
-
-
-
 .dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -353,7 +357,8 @@ body {
 /* Sidebar Styles */
 .sidebar {
   width: 250px;
-  background: #ff6b35;
+  /* background: #ff6b35; */
+  background-color: #343131;
   color: white;
   padding: 20px 0;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -455,32 +460,32 @@ body {
   .dashboard-container {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100%;
     padding: 10px 0;
   }
-  
+
   .sidebar-title {
     margin-bottom: 15px;
   }
-  
+
   .sidebar-menu {
     display: flex;
     overflow-x: auto;
   }
-  
+
   .menu-item {
     padding: 10px 15px;
     white-space: nowrap;
   }
-  
+
   .header {
     flex-direction: column;
     gap: 15px;
     text-align: center;
   }
-  
+
   .header-right {
     flex-direction: column;
     gap: 10px;
@@ -534,9 +539,6 @@ body {
   cursor: not-allowed;
 }
 
-
-
-
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -553,8 +555,6 @@ body {
 .user-table th {
   background: #f2f2f2;
 }
-
-
 
 .btn-primary {
   background-color: #ff7f50; /* Orange shade */
@@ -577,9 +577,6 @@ body {
   text-align: center;
 }
 
-
-
-
 /* Collapsed Sidebar */
 .sidebar.collapsed {
   width: 80px;
@@ -596,7 +593,8 @@ body {
 }
 
 /* Small Buttons */
-.btn-icon, .btn-small {
+.btn-icon,
+.btn-small {
   background: var(--primary-color);
   color: var(--btn-text);
   border: none;
@@ -607,7 +605,8 @@ body {
   transition: 0.3s ease;
 }
 
-.btn-icon:hover, .btn-small:hover {
+.btn-icon:hover,
+.btn-small:hover {
   background: #e85b2c;
 }
 
@@ -663,11 +662,15 @@ body {
 
 /* Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
-
 
 /* Dashboard Page */
 .dashboard-page {
@@ -757,7 +760,6 @@ body {
   background: rgba(255, 107, 53, 0.05);
 }
 
-
 /* User Details Page */
 .user-details-page {
   padding: 20px;
@@ -819,30 +821,29 @@ body {
   color: var(--text-secondary);
 }
 
-
 /* Clean Status Badges */
 .status {
-  padding: 4px 12px;          /* Thoda chhota aur balanced padding */
-  border-radius: 999px;       /* Full pill shape */
-  font-size: 0.85rem;         /* Chhota aur neat text */
+  padding: 4px 12px; /* Thoda chhota aur balanced padding */
+  border-radius: 999px; /* Full pill shape */
+  font-size: 0.85rem; /* Chhota aur neat text */
   font-weight: 600;
   display: inline-block;
   text-align: center;
-  min-width: 70px;            /* Uniform width for all statuses */
+  min-width: 70px; /* Uniform width for all statuses */
   transition: background 0.3s, color 0.3s;
 }
 
 .status.paid {
-  background-color: #28a745;  /* Green */
+  background-color: #28a745; /* Green */
   color: #ffffff;
 }
 
 .status.pending {
-  background-color: #ffc107;  /* Yellow */
+  background-color: #ffc107; /* Yellow */
   color: #000000;
 }
 
 .status.failed {
-  background-color: #dc3545;  /* Red */
+  background-color: #dc3545; /* Red */
   color: #ffffff;
 }
