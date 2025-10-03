@@ -151,9 +151,9 @@ const FreightRate = () => {
           mb: 2,
         }}
       >
-        <Typography variant="h5" sx={{ color: "#ff6b35", fontWeight: "bold" }}>
+        {/* <Typography variant="h5" sx={{ color: "#ff6b35", fontWeight: "bold" }}>
           Freight Rate Management
-        </Typography>
+        </Typography> */}
         <Button
           variant="contained"
           sx={{ background: "#ff6b35", textTransform: "none" }}
