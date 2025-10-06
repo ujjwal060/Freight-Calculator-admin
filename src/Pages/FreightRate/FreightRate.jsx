@@ -207,7 +207,7 @@ const FreightRate = () => {
                     <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
                       Arrival
                     </TableCell>
-                    <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
+                    {/* <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
                       <TableSortLabel
                         active={orderBy === "basePrice.Dry"}
                         direction={orderBy === "basePrice.Dry" ? order : "asc"}
@@ -220,21 +220,49 @@ const FreightRate = () => {
                       >
                         Base Price (Dry)
                       </TableSortLabel>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
-                      <TableSortLabel
-                        active={orderBy === "basePrice.Reefer"}
-                        direction={orderBy === "basePrice.Reefer" ? order : "asc"}
-                        onClick={() => handleSort("basePrice.Reefer")}
-                        hideSortIcon={false}
-                        sx={{
-                          color: "#fff",
-                          "& .MuiTableSortLabel-icon": { color: "#fff !important" },
-                        }}
-                      >
-                        Base Price (Reefer)
-                      </TableSortLabel>
-                    </TableCell>
+  <TableSortLabel
+    active={orderBy === "basePrice.Dry"}
+    direction={orderBy === "basePrice.Dry" ? order : "asc"}
+    onClick={() => handleSort("basePrice.Dry")}
+    hideSortIcon={false}
+    sx={{
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",
+      "& .MuiTableSortLabel-icon": { color: "#fff !important" },
+    }}
+  >
+    <Box component="span" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+      Base Price (Dry)
+      <span style={{ fontWeight: "bold", marginLeft: "4px" }}>$</span>
+    </Box>
+  </TableSortLabel>
+</TableCell>
+
+               <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
+  <TableSortLabel
+    active={orderBy === "basePrice.Reefer"}
+    direction={orderBy === "basePrice.Reefer" ? order : "asc"}
+    onClick={() => handleSort("basePrice.Reefer")}
+    hideSortIcon={false}
+    sx={{
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",
+      "& .MuiTableSortLabel-icon": { color: "#fff !important" },
+    }}
+  >
+    <Box component="span" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+      Base Price (Reefer)
+      <span style={{ fontWeight: "bold", marginLeft: "4px" }}>$</span>
+    </Box>
+  </TableSortLabel>
+</TableCell>
+
                     <TableCell sx={{ background: "#ff6b35", color: "#fff" }}>
                       Actions
                     </TableCell>
