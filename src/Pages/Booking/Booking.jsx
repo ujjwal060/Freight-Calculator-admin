@@ -550,10 +550,16 @@
 // export default Booking;
 
 
+
+
+
 import React, { useState, useEffect } from "react";
 import {
+  Typography,
   Box,
   Stack,
+  Button,
+  CircularProgress,
   Tooltip,
   IconButton,
   Tabs,
@@ -575,18 +581,24 @@ const Booking = () => {
     pending: 0,
     confirmed: 0,
     delivered: 0,
-    cancelled: 0,
-    All: 0
   });
   const [tabValue, setTabValue] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const [orderBy, setOrderBy] = useState("bookingId");
-  const [order, setOrder] = useState("asc");
+  const [sortField, setSortField] = useState("");
+  const [sortBy, setSortBy] = useState(-1);
   const [dateRange, setDateRange] = useState([null, null]);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("bookingId");
 
-  const statusOptions = ["All", "Pending", "Confirmed", "Delivered", "Cancelled"];
+  const statusOptions = [
+    "All",
+    "Pending",
+    "Confirmed",
+    "Delivered",
+    "Cancelled",
+  ];
 
   const fetchCounts = async () => {
     try {
@@ -596,13 +608,7 @@ const Booking = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data?.data) {
-        const countsData = response.data.data;
-        // Calculate total count
-        const total = countsData.pending + countsData.confirmed + countsData.delivered + countsData.cancelled;
-        setCounts({
-          ...countsData,
-          All: total
-        });
+        setCounts(response.data.data);
       }
     } catch (err) {
       console.error("Counts API Error:", err);
@@ -621,14 +627,13 @@ const Booking = () => {
       filters: {},
     };
 
-    // Add date range filter if selected
     if (dateRange[0] && dateRange[1]) {
       payload.filters.eta = {
-        $gte: dateRange[0].format("YYYY-MM-DD"),
-        $lte: dateRange[1].format("YYYY-MM-DD"),
+        $gte: dateRange[0],
+        $lte: dateRange[1],
       };
     }
-
+    
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
@@ -637,15 +642,7 @@ const Booking = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const bookingsWithCustomer = (response.data?.data?.bookings || []).map(booking => ({
-        ...booking,
-        customerName: booking.user?.name || "N/A",
-        email: booking.user?.email || "N/A",
-        mobile: booking.user?.mobileNumber || "N/A",
-        route: `${booking.freightRate?.departurePort} → ${booking.freightRate?.arrivalPort}`
-      }));
-
-      setBookings(bookingsWithCustomer);
+      setBookings(response.data?.data?.bookings || []);
       setTotalCount(response.data?.data?.totalCount || 0);
     } catch (err) {
       console.error("API Error:", err);
@@ -677,26 +674,40 @@ const Booking = () => {
     }
   };
 
-  const getActionIcons = (booking) => {
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
+  useEffect(() => {
+    fetchBookings();
+    fetchCounts();
+  }, [filter, page, rowsPerPage, order, orderBy, dateRange]);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+    setFilter(statusOptions[newValue]);
+  };
+
+  const getActionIcons = (b) => {
     const actions = [];
 
-    switch (booking.status) {
+    switch (b.status) {
       case "Pending":
         actions.push(
           <Tooltip title="Confirm" key="confirm">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Confirmed")}
+              onClick={() => handleStatusUpdate(b._id, "Confirmed")}
               color="success"
-              size="small"
             >
               <CheckCircle />
             </IconButton>
           </Tooltip>,
           <Tooltip title="Cancel" key="cancel">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Cancelled")}
+              onClick={() => handleStatusUpdate(b._id, "Cancelled")}
               color="error"
-              size="small"
             >
               <Cancel />
             </IconButton>
@@ -708,9 +719,8 @@ const Booking = () => {
         actions.push(
           <Tooltip title="Deliver" key="deliver">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Delivered")}
+              onClick={() => handleStatusUpdate(b._id, "Delivered")}
               color="info"
-              size="small"
             >
               <LocalShipping />
             </IconButton>
@@ -721,7 +731,7 @@ const Booking = () => {
       case "Delivered":
         actions.push(
           <Tooltip title="Delivered" key="delivered">
-            <IconButton disabled color="info" size="small">
+            <IconButton disabled color="info">
               <LocalShipping />
             </IconButton>
           </Tooltip>
@@ -731,7 +741,7 @@ const Booking = () => {
       case "Cancelled":
         actions.push(
           <Tooltip title="Cancelled" key="cancelled">
-            <IconButton disabled color="error" size="small">
+            <IconButton disabled color="error">
               <Cancel />
             </IconButton>
           </Tooltip>
@@ -742,27 +752,24 @@ const Booking = () => {
         actions.push(
           <Tooltip title="Confirm" key="confirm">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Confirmed")}
+              onClick={() => handleStatusUpdate(b._id, "Confirmed")}
               color="success"
-              size="small"
             >
               <CheckCircle />
             </IconButton>
           </Tooltip>,
           <Tooltip title="Deliver" key="deliver">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Delivered")}
+              onClick={() => handleStatusUpdate(b._id, "Delivered")}
               color="info"
-              size="small"
             >
               <LocalShipping />
             </IconButton>
           </Tooltip>,
           <Tooltip title="Cancel" key="cancel">
             <IconButton
-              onClick={() => handleStatusUpdate(booking._id, "Cancelled")}
+              onClick={() => handleStatusUpdate(b._id, "Cancelled")}
               color="error"
-              size="small"
             >
               <Cancel />
             </IconButton>
@@ -774,60 +781,80 @@ const Booking = () => {
     return actions;
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSort = (field) => {
+    const isAsc = orderBy === field && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(field);
+  };
+
+  // Define columns for CommonTable
   const columns = [
-    { 
-      field: "bookingId", 
-      headerName: "Booking ID", 
+    {
+      field: "bookingId",
+      headerName: "Booking ID",
       minWidth: 120,
-      sortable: true 
+      sortable: true,
     },
-    { 
-      field: "customerName", 
-      headerName: "Customer Name", 
-      minWidth: 150 
+    {
+      field: "customerName",
+      headerName: "Customer Name",
+      minWidth: 150,
+      renderCell: (row) => row.user?.name || "N/A"
     },
-    { 
+    {
       field: "email", 
-      headerName: "Email", 
-      minWidth: 200 
+      headerName: "Email",
+      minWidth: 200,
+      renderCell: (row) => row.user?.email || "N/A"
     },
-    { 
-      field: "mobile", 
+    {
+      field: "mobile",
       headerName: "Mobile", 
-      minWidth: 120 
+      minWidth: 120,
+      renderCell: (row) => row.user?.mobileNumber || "N/A"
     },
-    { 
-      field: "eta", 
-      headerName: "ETA", 
+    {
+      field: "eta",
+      headerName: "ETA",
       minWidth: 120,
       sortable: true,
       renderCell: (row) => new Date(row.eta).toLocaleDateString()
     },
-    { 
-      field: "price", 
-      headerName: "Price", 
+    {
+      field: "price",
+      headerName: "Price",
       minWidth: 100,
-      sortable: true 
+      sortable: true,
     },
-    { 
-      field: "containerType", 
-      headerName: "Container Type", 
-      minWidth: 150 
+    {
+      field: "containerType",
+      headerName: "Container Type",
+      minWidth: 150,
     },
-    { 
-      field: "totalContainers", 
-      headerName: "Total Containers", 
+    {
+      field: "totalContainers",
+      headerName: "Total Containers",
       minWidth: 120,
-      sortable: true 
+      sortable: true,
     },
-    { 
-      field: "route", 
-      headerName: "Departure → Arrival", 
-      minWidth: 200
+    {
+      field: "route",
+      headerName: "Departure → Arrival",
+      minWidth: 200,
+      renderCell: (row) => `${row.freightRate?.departurePort} → ${row.freightRate?.arrivalPort}`
     },
-    { 
-      field: "status", 
-      headerName: "Status", 
+    {
+      field: "status",
+      headerName: "Status",
       minWidth: 120,
       renderCell: (row) => (
         <span
@@ -849,52 +876,26 @@ const Booking = () => {
         </span>
       )
     },
-    { 
-      field: "actions", 
-      headerName: "Actions", 
+    {
+      field: "actions",
+      headerName: "Actions",
       minWidth: 150,
       renderCell: (row) => (
-        <Stack direction="row" spacing={0.5}>
+        <Stack direction="row" spacing={1}>
           {getActionIcons(row)}
         </Stack>
       )
     },
   ];
 
-  useEffect(() => {
-    fetchBookings();
-    fetchCounts();
-  }, [filter, page, rowsPerPage, order, orderBy, dateRange]);
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-    setFilter(statusOptions[newValue]);
-    setPage(0);
-  };
-
-  const handleSort = (field) => {
-    const isAsc = orderBy === field && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(field);
-  };
-
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   return (
     <Box sx={{ padding: "20px" }}>
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
+          flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: { xs: "stretch", md: "center" },
-          gap: 2,
-          mb: 2
+          alignItems: "center",
         }}
       >
         <Tabs
@@ -902,54 +903,40 @@ const Booking = () => {
           onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ 
-            mb: 2,
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 'normal',
-              minWidth: 'auto',
-              px: 2
-            }
-          }}
+          sx={{ mb: 2 }}
         >
           {statusOptions.map((status, index) => {
-            const count = counts[status.toLowerCase()] || 0;
+            const count = counts?.[status] ?? 0;
             return (
               <Tab
                 key={status}
                 label={`${status} (${count})`}
                 sx={{
+                  textTransform: "none",
                   fontWeight: filter === status ? "bold" : "normal",
                 }}
               />
             );
           })}
         </Tabs>
-        
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, minWidth: '200px' }}>
+        <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}>
           <DatePicker
             value={dateRange}
             onChange={setDateRange}
             range
             numberOfMonths={2}
             format="YYYY-MM-DD"
-            placeholder="Select date range"
+            containerStyle={{ width: "200px" }}
             style={{
-              width: "100%",
               borderRadius: "4px",
               border: "1px solid #ccc",
-              padding: "8px",
+              padding: "5px",
             }}
           />
         </Box>
       </Box>
 
-      {error && (
-        <Box sx={{ color: "red", mb: 2, textAlign: "center" }}>
-          {error}
-        </Box>
-      )}
-
+      {/* CommonTable Component */}
       <CommonTable
         columns={columns}
         data={bookings}
