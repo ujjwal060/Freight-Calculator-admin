@@ -553,6 +553,415 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   Typography,
+//   Box,
+//   Stack,
+//   Button,
+//   CircularProgress,
+//   Tooltip,
+//   IconButton,
+//   Tabs,
+//   Tab,
+// } from "@mui/material";
+// import CheckCircle from "@mui/icons-material/CheckCircle";
+// import LocalShipping from "@mui/icons-material/LocalShipping";
+// import Cancel from "@mui/icons-material/Cancel";
+// import axios from "../../api/axios";
+// import DatePicker from "react-multi-date-picker";
+// import CommonTable from "../../components/CommonTable";
+
+// const Booking = () => {
+//   const [bookings, setBookings] = useState([]);
+//   const [filter, setFilter] = useState("All");
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
+//   const [counts, setCounts] = useState({
+//     pending: 0,
+//     confirmed: 0,
+//     delivered: 0,
+//   });
+//   const [tabValue, setTabValue] = useState(0);
+//   const [page, setPage] = useState(0);
+//   const [rowsPerPage, setRowsPerPage] = useState(10);
+//   const [totalCount, setTotalCount] = useState(0);
+//   const [sortField, setSortField] = useState("");
+//   const [sortBy, setSortBy] = useState(-1);
+//   const [dateRange, setDateRange] = useState([null, null]);
+//   const [order, setOrder] = useState("asc");
+//   const [orderBy, setOrderBy] = useState("bookingId");
+
+//   const statusOptions = [
+//     "All",
+//     "Pending",
+//     "Confirmed",
+//     "Delivered",
+//     "Cancelled",
+//   ];
+
+//   const fetchCounts = async () => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       const response = await axios.get(
+//         "http://15.134.44.62:8888/api/admin/booking/counts",
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       if (response.data?.data) {
+//         setCounts(response.data.data);
+//       }
+//     } catch (err) {
+//       console.error("Counts API Error:", err);
+//     }
+//   };
+
+//   const fetchBookings = async () => {
+//     setLoading(true);
+//     setError("");
+//     const payload = {
+//       limit: rowsPerPage,
+//       offset: page * rowsPerPage,
+//       status: filter === "All" ? "" : filter,
+//       sortField: orderBy,
+//       sortBy: order === "asc" ? 1 : -1,
+//       filters: {},
+//     };
+
+//     if (dateRange[0] && dateRange[1]) {
+//       payload.filters.eta = {
+//         $gte: dateRange[0],
+//         $lte: dateRange[1],
+//       };
+//     }
+    
+//     try {
+//       const token = localStorage.getItem("token");
+//       const response = await axios.post(
+//         "http://15.134.44.62:8888/api/admin/booking/list",
+//         payload,
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       setBookings(response.data?.data?.bookings || []);
+//       setTotalCount(response.data?.data?.totalCount || 0);
+//     } catch (err) {
+//       console.error("API Error:", err);
+//       setError("Failed to fetch bookings.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleStatusUpdate = async (bookingId, newStatus) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       await axios.put(
+//         `http://15.134.44.62:8888/api/admin/booking/status/${bookingId}`,
+//         { status: newStatus },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
+
+//       fetchBookings();
+//       fetchCounts();
+//     } catch (err) {
+//       console.error("Status Update Error:", err.response?.data || err);
+//       alert("Failed to update status");
+//     }
+//   };
+
+//   const handleRequestSort = (property) => {
+//     const isAsc = orderBy === property && order === "asc";
+//     setOrder(isAsc ? "desc" : "asc");
+//     setOrderBy(property);
+//   };
+
+//   useEffect(() => {
+//     fetchBookings();
+//     fetchCounts();
+//   }, [filter, page, rowsPerPage, order, orderBy, dateRange]);
+
+//   const handleTabChange = (event, newValue) => {
+//     setTabValue(newValue);
+//     setFilter(statusOptions[newValue]);
+//   };
+
+//   const getActionIcons = (b) => {
+//     const actions = [];
+
+//     switch (b.status) {
+//       case "Pending":
+//         actions.push(
+//           <Tooltip title="Confirm" key="confirm">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Confirmed")}
+//               color="success"
+//             >
+//               <CheckCircle />
+//             </IconButton>
+//           </Tooltip>,
+//           <Tooltip title="Cancel" key="cancel">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Cancelled")}
+//               color="error"
+//             >
+//               <Cancel />
+//             </IconButton>
+//           </Tooltip>
+//         );
+//         break;
+
+//       case "Confirmed":
+//         actions.push(
+//           <Tooltip title="Deliver" key="deliver">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Delivered")}
+//               color="info"
+//             >
+//               <LocalShipping />
+//             </IconButton>
+//           </Tooltip>
+//         );
+//         break;
+
+//       case "Delivered":
+//         actions.push(
+//           <Tooltip title="Delivered" key="delivered">
+//             <IconButton disabled color="info">
+//               <LocalShipping />
+//             </IconButton>
+//           </Tooltip>
+//         );
+//         break;
+
+//       case "Cancelled":
+//         actions.push(
+//           <Tooltip title="Cancelled" key="cancelled">
+//             <IconButton disabled color="error">
+//               <Cancel />
+//             </IconButton>
+//           </Tooltip>
+//         );
+//         break;
+
+//       default:
+//         actions.push(
+//           <Tooltip title="Confirm" key="confirm">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Confirmed")}
+//               color="success"
+//             >
+//               <CheckCircle />
+//             </IconButton>
+//           </Tooltip>,
+//           <Tooltip title="Deliver" key="deliver">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Delivered")}
+//               color="info"
+//             >
+//               <LocalShipping />
+//             </IconButton>
+//           </Tooltip>,
+//           <Tooltip title="Cancel" key="cancel">
+//             <IconButton
+//               onClick={() => handleStatusUpdate(b._id, "Cancelled")}
+//               color="error"
+//             >
+//               <Cancel />
+//             </IconButton>
+//           </Tooltip>
+//         );
+//         break;
+//     }
+
+//     return actions;
+//   };
+
+//   const handleChangePage = (event, newPage) => {
+//     setPage(newPage);
+//   };
+
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(parseInt(event.target.value, 10));
+//     setPage(0);
+//   };
+
+//   const handleSort = (field) => {
+//     const isAsc = orderBy === field && order === "asc";
+//     setOrder(isAsc ? "desc" : "asc");
+//     setOrderBy(field);
+//   };
+
+//   // Define columns for CommonTable
+//   const columns = [
+//     {
+//       field: "bookingId",
+//       headerName: "Booking ID",
+//       minWidth: 120,
+//       sortable: true,
+//     },
+//     {
+//       field: "customerName",
+//       headerName: "Customer Name",
+//       minWidth: 150,
+//       renderCell: (row) => row.user?.name || "N/A"
+//     },
+//     {
+//       field: "email", 
+//       headerName: "Email",
+//       minWidth: 200,
+//       renderCell: (row) => row.user?.email || "N/A"
+//     },
+//     {
+//       field: "mobile",
+//       headerName: "Mobile", 
+//       minWidth: 120,
+//       renderCell: (row) => row.user?.mobileNumber || "N/A"
+//     },
+//     {
+//       field: "eta",
+//       headerName: "ETA",
+//       minWidth: 120,
+//       sortable: true,
+//       renderCell: (row) => new Date(row.eta).toLocaleDateString()
+//     },
+//     {
+//       field: "price",
+//       headerName: "Price",
+//       minWidth: 100,
+//       sortable: true,
+//     },
+//     {
+//       field: "containerType",
+//       headerName: "Container Type",
+//       minWidth: 150,
+//     },
+//     {
+//       field: "totalContainers",
+//       headerName: "Total Containers",
+//       minWidth: 120,
+//       sortable: true,
+//     },
+//     {
+//       field: "route",
+//       headerName: "Departure → Arrival",
+//       minWidth: 200,
+//       renderCell: (row) => `${row.freightRate?.departurePort} → ${row.freightRate?.arrivalPort}`
+//     },
+//     {
+//       field: "status",
+//       headerName: "Status",
+//       minWidth: 120,
+//       renderCell: (row) => (
+//         <span
+//           style={{
+//             color:
+//               row.status === "Confirmed"
+//                 ? "green"
+//                 : row.status === "Pending"
+//                 ? "orange"
+//                 : row.status === "Cancelled"
+//                 ? "red"
+//                 : row.status === "Delivered"
+//                 ? "blue"
+//                 : "gray",
+//             fontWeight: "bold",
+//           }}
+//         >
+//           {row.status}
+//         </span>
+//       )
+//     },
+//     {
+//       field: "actions",
+//       headerName: "Actions",
+//       minWidth: 150,
+//       renderCell: (row) => (
+//         <Stack direction="row" spacing={1}>
+//           {getActionIcons(row)}
+//         </Stack>
+//       )
+//     },
+//   ];
+
+//   return (
+//     <Box sx={{ padding: "20px" }}>
+//       <Box
+//         sx={{
+//           display: "flex",
+//           flexDirection: "row",
+//           justifyContent: "space-between",
+//           alignItems: "center",
+//         }}
+//       >
+//         <Tabs
+//           value={tabValue}
+//           onChange={handleTabChange}
+//           variant="scrollable"
+//           scrollButtons="auto"
+//           sx={{ mb: 2 }}
+//         >
+//           {statusOptions.map((status, index) => {
+//             const count = counts?.[status] ?? 0;
+//             return (
+//               <Tab
+//                 key={status}
+//                 label={`${status} (${count})`}
+//                 sx={{
+//                   textTransform: "none",
+//                   fontWeight: filter === status ? "bold" : "normal",
+//                 }}
+//               />
+//             );
+//           })}
+//         </Tabs>
+//         <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}>
+//           <DatePicker
+//             value={dateRange}
+//             onChange={setDateRange}
+//             range
+//             numberOfMonths={2}
+//             format="YYYY-MM-DD"
+//             containerStyle={{ width: "200px" }}
+//             style={{
+//               borderRadius: "4px",
+//               border: "1px solid #ccc",
+//               padding: "5px",
+//             }}
+//           />
+//         </Box>
+//       </Box>
+
+//       {/* CommonTable Component */}
+//       <CommonTable
+//         columns={columns}
+//         data={bookings}
+//         loading={loading}
+//         totalCount={totalCount}
+//         page={page}
+//         rowsPerPage={rowsPerPage}
+//         onPageChange={handleChangePage}
+//         onRowsPerPageChange={handleChangeRowsPerPage}
+//         orderBy={orderBy}
+//         order={order}
+//         onSort={handleSort}
+//         maxHeight="60vh"
+//         minHeight="60vh"
+//       />
+//     </Box>
+//   );
+// };
+
+// export default Booking;
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import {
   Typography,
@@ -564,6 +973,11 @@ import {
   IconButton,
   Tabs,
   Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import LocalShipping from "@mui/icons-material/LocalShipping";
@@ -591,6 +1005,12 @@ const Booking = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("bookingId");
+  
+  // New states for cancellation modal
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   const statusOptions = [
     "All",
@@ -652,12 +1072,19 @@ const Booking = () => {
     }
   };
 
-  const handleStatusUpdate = async (bookingId, newStatus) => {
+  const handleStatusUpdate = async (bookingId, newStatus, reason = "") => {
     try {
       const token = localStorage.getItem("token");
+      const payload = { status: newStatus };
+      
+      // Add reason only for cancellation
+      if (newStatus === "Cancelled" && reason) {
+        payload.reason = reason;
+      }
+      
       await axios.put(
         `http://15.134.44.62:8888/api/admin/booking/status/${bookingId}`,
-        { status: newStatus },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -672,6 +1099,41 @@ const Booking = () => {
       console.error("Status Update Error:", err.response?.data || err);
       alert("Failed to update status");
     }
+  };
+
+  // New function to handle cancellation with reason
+  const handleCancelWithReason = async () => {
+    if (!cancelReason.trim()) {
+      alert("Please provide a cancellation reason");
+      return;
+    }
+
+    setCancelling(true);
+    try {
+      await handleStatusUpdate(selectedBooking._id, "Cancelled", cancelReason);
+      setCancelModalOpen(false);
+      setCancelReason("");
+      setSelectedBooking(null);
+    } catch (err) {
+      console.error("Cancellation error:", err);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  // Function to open cancellation modal
+  const openCancelModal = (booking) => {
+    setSelectedBooking(booking);
+    setCancelReason("");
+    setCancelModalOpen(true);
+  };
+
+  // Function to close cancellation modal
+  const closeCancelModal = () => {
+    setCancelModalOpen(false);
+    setSelectedBooking(null);
+    setCancelReason("");
+    setCancelling(false);
   };
 
   const handleRequestSort = (property) => {
@@ -706,7 +1168,7 @@ const Booking = () => {
           </Tooltip>,
           <Tooltip title="Cancel" key="cancel">
             <IconButton
-              onClick={() => handleStatusUpdate(b._id, "Cancelled")}
+              onClick={() => openCancelModal(b)}
               color="error"
             >
               <Cancel />
@@ -723,6 +1185,14 @@ const Booking = () => {
               color="info"
             >
               <LocalShipping />
+            </IconButton>
+          </Tooltip>,
+          <Tooltip title="Cancel" key="cancel">
+            <IconButton
+              onClick={() => openCancelModal(b)}
+              color="error"
+            >
+              <Cancel />
             </IconButton>
           </Tooltip>
         );
@@ -768,7 +1238,7 @@ const Booking = () => {
           </Tooltip>,
           <Tooltip title="Cancel" key="cancel">
             <IconButton
-              onClick={() => handleStatusUpdate(b._id, "Cancelled")}
+              onClick={() => openCancelModal(b)}
               color="error"
             >
               <Cancel />
@@ -952,6 +1422,48 @@ const Booking = () => {
         maxHeight="60vh"
         minHeight="60vh"
       />
+
+      {/* Cancellation Reason Modal */}
+      <Dialog open={cancelModalOpen} onClose={closeCancelModal} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Cancel Booking
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Please provide a reason for cancelling booking{" "}
+            <strong>{selectedBooking?.bookingId}</strong>
+          </Typography>
+          <TextField
+            autoFocus
+            multiline
+            rows={4}
+            fullWidth
+            variant="outlined"
+            placeholder="Enter cancellation reason..."
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            disabled={cancelling}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={closeCancelModal} 
+            disabled={cancelling}
+            color="inherit"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCancelWithReason} 
+            disabled={cancelling || !cancelReason.trim()}
+            color="error"
+            variant="contained"
+            startIcon={cancelling ? <CircularProgress size={20} /> : null}
+          >
+            {cancelling ? "Cancelling..." : "Confirm Cancellation"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
