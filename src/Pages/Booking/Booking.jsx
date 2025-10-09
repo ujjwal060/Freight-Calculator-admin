@@ -985,7 +985,9 @@ import Cancel from "@mui/icons-material/Cancel";
 import axios from "../../api/axios";
 import DatePicker from "react-multi-date-picker";
 import CommonTable from "../../components/CommonTable";
-
+// Correct import for React-Bootstrap
+// Correct import for Material-UI
+import Close from '@mui/icons-material/Close';
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
   const [filter, setFilter] = useState("All");
@@ -1424,7 +1426,7 @@ const Booking = () => {
       />
 
       {/* Cancellation Reason Modal */}
-      <Dialog open={cancelModalOpen} onClose={closeCancelModal} maxWidth="sm" fullWidth>
+      {/* <Dialog open={cancelModalOpen} onClose={closeCancelModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           Cancel Booking
         </DialogTitle>
@@ -1463,7 +1465,175 @@ const Booking = () => {
             {cancelling ? "Cancelling..." : "Confirm Cancellation"}
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
+
+
+     <Dialog 
+  open={cancelModalOpen} 
+  onClose={closeCancelModal} 
+  maxWidth="sm" 
+  fullWidth
+  PaperProps={{
+    sx: {
+      borderRadius: 3,
+      boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+      overflow: 'hidden'
+    }
+  }}
+>
+  {/* Header with #ff6b35 Color */}
+  <DialogTitle sx={{ 
+    background: 'linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%)',
+    color: 'white',
+    py: 2,
+    textAlign: 'center',
+    position: 'relative'
+  }}>
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      gap: 1
+    }}>
+      <Cancel sx={{ fontSize: 28, color: 'white' }} />
+      <Typography variant="h6" component="div" fontWeight="bold">
+        Cancel Booking
+      </Typography>
+    </Box>
+    <IconButton
+      aria-label="close"
+      onClick={closeCancelModal}
+      sx={{
+        position: 'absolute',
+        right: 16,
+        top: 16,
+        color: 'white',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        '&:hover': {
+          backgroundColor: 'rgba(255,255,255,0.3)',
+        }
+      }}
+    >
+      <Close />
+    </IconButton>
+  </DialogTitle>
+
+  <DialogContent sx={{ p: 3 }}>
+    {/* Booking Info Card */}
+    <Box sx={{
+      backgroundColor: '#fff8f6',
+      border: '1px solid #ffebe6',
+      borderRadius: 2,
+      p: 2,
+      mb: 3
+    }}>
+      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontWeight: 'medium' }}>
+        Booking Reference:
+      </Typography>
+      <Typography variant="h6" sx={{ color: '#ff6b35', fontWeight: 'bold' }}>
+        {selectedBooking?.bookingId}
+      </Typography>
+    </Box>
+
+    <Typography variant="body1" sx={{ mb: 2, color: 'text.primary', fontWeight: '500' }}>
+      Please provide a reason for cancellation
+    </Typography>
+    
+    {/* <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      This reason will be shared with the customer and cannot be changed later.
+    </Typography> */}
+
+    <TextField
+      autoFocus
+      multiline
+      rows={4}
+      fullWidth
+      variant="outlined"
+      placeholder="Enter detailed cancellation reason here..."
+      value={cancelReason}
+      onChange={(e) => setCancelReason(e.target.value)}
+      disabled={cancelling}
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          borderRadius: 2,
+          transition: 'all 0.3s ease',
+          '&:hover fieldset': {
+            borderColor: '#ff6b35',
+          },
+          '&.Mui-focused fieldset': {
+            borderColor: '#ff6b35',
+            borderWidth: 2,
+          },
+        },
+        '& .MuiInputBase-input': {
+          color: 'text.primary',
+        }
+      }}
+    />
+    
+    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+      Minimum 10 characters required
+    </Typography>
+  </DialogContent>
+
+  <DialogActions sx={{ 
+    p: 3, 
+    gap: 2,
+    borderTop: '1px solid #f0f0f0'
+  }}>
+    <Button 
+      onClick={closeCancelModal} 
+      disabled={cancelling}
+      variant="outlined"
+      startIcon={<Close />}
+      sx={{ 
+        borderRadius: 2,
+        px: 4,
+        py: 1,
+        textTransform: 'none',
+        fontWeight: '600',
+        borderColor: 'grey.400',
+        color: 'grey.700',
+        '&:hover': {
+          borderColor: 'grey.600',
+          backgroundColor: 'grey.50'
+        }
+      }}
+    >
+      Keep Booking
+    </Button>
+    <Button 
+      onClick={handleCancelWithReason} 
+      disabled={cancelling || !cancelReason.trim() || cancelReason.trim().length < 10}
+      variant="contained"
+      startIcon={cancelling ? <CircularProgress size={20} color="inherit" /> : <Cancel />}
+      sx={{ 
+        borderRadius: 2,
+        px: 4,
+        py: 1,
+        textTransform: 'none',
+        fontWeight: 'bold',
+        fontSize: '1rem',
+        background: 'linear-gradient(135deg, #ff6b35 0%, #e55a2b 100%)',
+        boxShadow: '0 4px 14px rgba(255, 107, 53, 0.4)',
+        color: 'white',
+        '&:hover': {
+          background: 'linear-gradient(135deg, #ff5a22 0%, #d4491a 100%)',
+          boxShadow: '0 6px 20px rgba(255, 107, 53, 0.6)',
+          transform: 'translateY(-1px)',
+        },
+        '&:disabled': {
+          background: 'grey.300',
+          boxShadow: 'none',
+          transform: 'none',
+        },
+        transition: 'all 0.3s ease'
+      }}
+    >
+      {cancelling ? "Cancelling..." : "Confirm Cancellation"}
+    </Button>
+  </DialogActions>
+</Dialog>
     </Box>
   );
 };
